@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Tracker - Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">Smart Tracker</div>
+        <div class="nav-actions">
+            <span id="user-name">Welcome, User</span>
+            <button id="theme-toggle" class="btn secondary-btn">Toggle Theme</button>
+            <button id="logout-btn" class="btn danger-btn">Logout</button>
+        </div>
+    </nav>
+
+    <div class="container dashboard-grid">
+        <!-- Stats Section -->
+        <div class="card stats-card">
+            <h3>Overview</h3>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <h4>Total Expenses</h4>
+                    <p id="total-expenses" class="stat-value">₹0</p>
+                </div>
+                <div class="stat-item">
+                    <h4>Pending Tasks</h4>
+                    <p id="pending-tasks" class="stat-value">0</p>
+                </div>
+                <div class="stat-item">
+                    <h4>Completed Tasks</h4>
+                    <p id="completed-tasks" class="stat-value">0</p>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="expenseChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Expenses Section -->
+        <div class="card expense-card">
+            <h3>Expenses</h3>
+            <form id="expense-form" class="inline-form">
+                <input type="text" id="exp-title" placeholder="Description" required>
+                <input type="number" id="exp-amount" placeholder="Amount" required>
+                <select id="exp-category" required>
+                    <option value="" disabled selected>Category</option>
+                    <option value="Food">Food</option>
+                    <option value="Travel">Travel</option>
+                    <option value="Shopping">Shopping</option>
+                    <option value="Bills">Bills</option>
+                    <option value="Others">Others</option>
+                </select>
+                <button type="submit" class="btn primary-btn">Add</button>
+            </form>
+            
+            <div class="filter-section">
+                <input type="text" id="search-expense" placeholder="Search expenses...">
+                <select id="filter-category">
+                    <option value="All">All Categories</option>
+                    <option value="Food">Food</option>
+                    <option value="Travel">Travel</option>
+                    <option value="Shopping">Shopping</option>
+                    <option value="Bills">Bills</option>
+                    <option value="Others">Others</option>
+                </select>
+            </div>
+
+            <ul id="expense-list" class="item-list">
+                <!-- Expenses loaded here -->
+            </ul>
+        </div>
+
+        <!-- Tasks Section -->
+        <div class="card tasks-card">
+            <h3>Daily Tasks</h3>
+            <form id="task-form" class="inline-form">
+                <input type="text" id="task-name" placeholder="New Task..." required>
+                <button type="submit" class="btn primary-btn">Add Task</button>
+            </form>
+            
+            <ul id="task-list" class="item-list">
+                <!-- Tasks loaded here -->
+            </ul>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast hidden"></div>
+
+    <script src="js/dashboard.js"></script>
+</body>
+</html>

@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Tracker | Dashboard</title>
+    <!-- Google Fonts:  -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div id="app">
+        <!-- Toast Notification Area -->
+        <div id="toast-container"></div>
+
+        <!-- Background Elements -->
+        <div class="bg-shape shape-1"></div>
+        <div class="bg-shape shape-2"></div>
+        <div class="bg-shape shape-3"></div>
+
+        <!-- Auth Container -->
+        <div id="auth-container" class="glass-panel active-view">
+            <div class="auth-header">
+                <h2><i class="fa-solid fa-chart-line"></i> Smart Tracker</h2>
+                <p>Welcome back! Please enter your details.</p>
+            </div>
+
+            <!-- Login Form -->
+            <form id="login-form">
+                <div class="input-group">
+                    <label for="login-email">Email</label>
+                    <div class="input-wrapper">
+                        <i class="fa-regular fa-envelope"></i>
+                        <input type="email" id="login-email" placeholder="Enter your email" required>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label for="login-password">Password</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-lock"></i>
+                        <input type="password" id="login-password" placeholder="Enter your password" required>
+                    </div>
+                    <div class="forgot-row">
+                        <a href="#" id="go-to-forgot" class="forgot-link">Forgot password?</a>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+                <p class="auth-switch">Don't have an account? <a href="#" id="go-to-register">Sign up</a></p>
+            </form>
+
+            <!-- Register Form -->
+            <form id="register-form" class="hidden">
+                <div class="input-group">
+                    <label for="register-name">Full Name</label>
+                    <div class="input-wrapper">
+                        <i class="fa-regular fa-user"></i>
+                        <input type="text" id="register-name" placeholder="Enter your full name" required>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label for="register-email">Email</label>
+                    <div class="input-wrapper">
+                        <i class="fa-regular fa-envelope"></i>
+                        <input type="email" id="register-email" placeholder="Enter your email" required>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label for="register-password">Password</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-lock"></i>
+                        <input type="password" id="register-password" placeholder="Create a password" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Sign Up</button>
+                <p class="auth-switch">Already have an account? <a href="#" id="go-to-login">Sign in</a></p>
+            </form>
+
+            <!-- Forgot Password Form (Step 1: Enter email) -->
+            <form id="forgot-password-form" class="hidden">
+                <div class="forgot-header">
+                    <div class="forgot-icon">
+                        <i class="fa-solid fa-key"></i>
+                    </div>
+                    <h3>Reset Password</h3>
+                    <p>Enter your email and we'll generate a reset code for you.</p>
+                </div>
+                <div class="input-group">
+                    <label for="forgot-email">Email Address</label>
+                    <div class="input-wrapper">
+                        <i class="fa-regular fa-envelope"></i>
+                        <input type="email" id="forgot-email" placeholder="Enter your registered email" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block" id="send-code-btn">Generate Reset Code</button>
+                <p class="auth-switch"><a href="#" id="back-to-login"><i class="fa-solid fa-arrow-left"></i> Back to
+                        Sign In</a></p>
+            </form>
+
+            <!-- Reset Password Form (Step 2: Enter code + new password) -->
+            <form id="reset-password-form" class="hidden">
+                <div class="forgot-header">
+                    <div class="forgot-icon success">
+                        <i class="fa-solid fa-lock-open"></i>
+                    </div>
+                    <h3>Set New Password</h3>
+                    <p>Enter the 6-digit code and your new password.</p>
+                </div>
+                <div class="input-group">
+                    <label for="reset-email">Email Address</label>
+                    <div class="input-wrapper">
+                        <i class="fa-regular fa-envelope"></i>
+                        <input type="email" id="reset-email" placeholder="Your email" required>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label for="reset-token">Reset Code</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-hashtag"></i>
+                        <input type="text" id="reset-token" placeholder="6-digit code" maxlength="6" required>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label for="reset-new-password">New Password</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-lock"></i>
+                        <input type="password" id="reset-new-password" placeholder="Create a new password" required
+                            minlength="6">
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label for="reset-confirm-password">Confirm Password</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-lock"></i>
+                        <input type="password" id="reset-confirm-password" placeholder="Confirm new password" required
+                            minlength="6">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Reset Password</button>
+                <p class="auth-switch"><a href="#" id="back-to-forgot"><i class="fa-solid fa-arrow-left"></i> Back</a>
+                </p>
+            </form>
+        </div>
+
+        <!-- Dashboard Container -->
+        <div id="dashboard-container" class="hidden">
+
+            <!-- Sidebar -->
+            <aside class="sidebar glass-panel">
+                <div class="brand">
+                    <h2><i class="fa-solid fa-chart-line"></i> Tracker</h2>
+                </div>
+                <nav class="nav-menu">
+                    <a href="#" class="nav-item active" data-target="overview-section"><i class="fa-solid fa-house"></i>
+                        Overview</a>
+                    <a href="#" class="nav-item" data-target="expenses-section"><i class="fa-solid fa-wallet"></i>
+                        Expenses</a>
+                    <a href="#" class="nav-item" data-target="tasks-section"><i class="fa-solid fa-list-check"></i>
+                        Tasks</a>
+                </nav>
+                <div class="user-profile">
+                    <div class="avatar"><i class="fa-solid fa-user"></i></div>
+                    <div class="user-info">
+                        <span id="user-name-display">User Name</span>
+                        <a href="#" id="logout-btn" class="logout-link"><i class="fa-solid fa-right-from-bracket"></i>
+                            Logout</a>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="main-content">
+                <header class="top-header">
+                    <h1 id="page-title">Overview</h1>
+                    <div class="header-actions">
+                        <div class="date-display" id="current-date"></div>
+                    </div>
+                </header>
+
+                <div class="content-wrapper">
+                    <!-- Overview Section -->
+                    <section id="overview-section" class="dashboard-section active-section">
+                        <div class="stats-grid">
+                            <div class="stat-card glass-panel">
+                                <div class="stat-icon income-icon"><i class="fa-solid fa-arrow-trend-up"></i></div>
+                                <div class="stat-details">
+                                    <p>Total Tasks</p>
+                                    <h3 id="stat-total-tasks">0</h3>
+                                </div>
+                            </div>
+                            <div class="stat-card glass-panel">
+                                <div class="stat-icon expense-icon"><i class="fa-solid fa-money-bill-wave"></i></div>
+                                <div class="stat-details">
+                                    <p>Total Expenses</p>
+                                    <h3 id="stat-total-expenses">₹0.00</h3>
+                                </div>
+                            </div>
+                            <div class="stat-card glass-panel">
+                                <div class="stat-icon tasks-icon"><i class="fa-solid fa-check-double"></i></div>
+                                <div class="stat-details">
+                                    <p>Completed Tasks</p>
+                                    <h3 id="stat-completed-tasks">0</h3>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="dashboard-widgets">
+                            <div class="widget glass-panel">
+                                <h3>Recent Expenses</h3>
+                                <ul class="recent-list" id="recent-expenses-list">
+                                    <!--  JS -->
+                                    <li class="empty-state">No recent expenses</li>
+                                </ul>
+                            </div>
+                            <div class="widget glass-panel">
+                                <h3>Pending Tasks</h3>
+                                <ul class="recent-list" id="recent-tasks-list">
+
+                                    <li class="empty-state">No pending tasks</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Expenses Section -->
+                    <section id="expenses-section" class="dashboard-section hidden">
+                        <div class="section-header">
+                            <h2>Manage Expenses</h2>
+                            <button class="btn btn-primary" id="add-expense-btn"><i class="fa-solid fa-plus"></i> Add
+                                Expense</button>
+                        </div>
+
+                        <!-- Add Expense Form -->
+                        <div id="expense-form-container" class="form-panel glass-panel hidden">
+                            <form id="expense-form">
+                                <div class="form-row">
+                                    <div class="input-group">
+                                        <label>Title</label>
+                                        <input type="text" id="expense-title" placeholder="e.g. Groceries" required>
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Amount (₹)</label>
+                                        <input type="number" step="0.01" id="expense-amount" placeholder="0.00"
+                                            required>
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Category</label>
+                                        <select id="expense-category" required>
+                                            <option value="Food">Food</option>
+                                            <option value="Transport">Transport</option>
+                                            <option value="Utilities">Utilities</option>
+                                            <option value="Entertainment">Entertainment</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-actions">
+                                    <button type="button" class="btn btn-secondary"
+                                        id="cancel-expense-btn">Cancel</button>
+                                    <button type="submit" class="btn btn-primary">Save Expense</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div class="data-table-container glass-panel">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Title</th>
+                                        <th>Category</th>
+                                        <th>Amount</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="expenses-table-body">
+
+                                    <!-- Populated by JS -->
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+
+                    <!-- Tasks -->
+                    <section id="tasks-section" class="dashboard-section hidden">
+                        <div class="section-header">
+                            <h2>Manage Tasks</h2>
+                            <button class="btn btn-primary" id="add-task-btn"><i class="fa-solid fa-plus"></i> Add
+                                Task</button>
+                        </div>
+
+                        <!-- Add Task Form -->
+                        <div id="task-form-container" class="form-panel glass-panel hidden">
+                            <form id="task-form">
+                                <div class="form-row">
+                                    <div class="input-group" style="flex: 1;">
+                                        <label>Task Description</label>
+                                        <input type="text" id="task-name" placeholder="What needs to be done?" required>
+                                    </div>
+                                </div>
+                                <div class="form-actions">
+                                    <button type="button" class="btn btn-secondary" id="cancel-task-btn">Cancel</button>
+                                    <button type="submit" class="btn btn-primary">Save Task</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div class="tasks-container glass-panel">
+                            <ul class="task-list" id="tasks-list">
+                                <!-- Populated by JS -->
+                            </ul>
+                        </div>
+                    </section>
+                </div>
+            </main>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+
+</html>
