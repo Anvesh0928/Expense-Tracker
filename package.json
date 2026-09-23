@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "node backend/server.js",
-    "dev": "nodemon backend/server.js"
+    "dev": "nodemon backend/server.js",
+    "test": "node --check backend/server.js && node --check backend/utils/requireUser.js && node --check backend/routes/auth.js && node --check backend/routes/expenses.js && node --check backend/routes/tasks.js"
   },
   "keywords": [],
   "author": "",
