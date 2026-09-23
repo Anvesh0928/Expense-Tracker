@@ -1,54 +1,67 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const router = express.Router();
 const Expense = require('../models/Expense');
+const requireUser = require('../utils/requireUser');
 
-// Check that a user-id header was sent
-const checkAuth = (req, res, next) => {
-    const userId = req.headers['user-id'];
-    if (!userId) return res.status(401).json({ msg: 'No User ID, authorization denied' });
-    req.userId = userId;
-    next();
-};
+router.use(requireUser);
 
 // GET /api/expenses
-router.get('/', checkAuth, async (req, res) => {
+router.get('/', async (req, res) => {
     try {
         const expenses = await Expense.find({ userId: req.userId }).sort({ date: -1 });
-        res.json(expenses);
+        return res.json(expenses);
     } catch (err) {
-        console.error(err.message);
-        res.status(500).json({ msg: 'Server Error' });
+        console.error('Get expenses error:', err.message);
+        return res.status(500).json({ msg: 'Server Error' });
     }
 });
 
 // POST /api/expenses
-router.post('/', checkAuth, async (req, res) => {
+router.post('/', async (req, res) => {
     try {
-        const { title, amount, category } = req.body;
-        const newExpense = new Expense({ userId: req.userId, title, amount, category });
-        const expense = await newExpense.save();
-        res.json(expense);
+        const title = typeof req.body.title === 'string' ? req.body.title.trim() : '';
+        const category = typeof req.body.category === 'string' ? req.body.category.trim() : '';
+        const amount = Number(req.body.amount);
+
+        if (!title || !category || !Number.isFinite(amount) || amount <= 0) {
+            return res.status(400).json({ msg: 'Enter a valid title, category, and positive amount.' });
+        }
+
+        const newExpense = await Expense.create({
+            userId: req.userId,
+            title,
+            amount,
+            category
+        });
+
+        return res.status(201).json(newExpense);
     } catch (err) {
-        console.error(err.message);
-        res.status(500).json({ msg: 'Server Error' });
+        if (err.name === 'ValidationError') {
+            return res.status(400).json({ msg: 'Please provide valid expense details.' });
+        }
+        console.error('Create expense error:', err.message);
+        return res.status(500).json({ msg: 'Server Error' });
     }
 });
 
 // DELETE /api/expenses/:id
-router.delete('/:id', checkAuth, async (req, res) => {
+router.delete('/:id', async (req, res) => {
     try {
-        const expense = await Expense.findById(req.params.id);
-        if (!expense) return res.status(404).json({ msg: 'Expense not found' });
-
-        if (expense.userId.toString() !== req.userId) {
-            return res.status(401).json({ msg: 'Not authorized' });
+        if (!mongoose.isValidObjectId(req.params.id)) {
+            return res.status(400).json({ msg: 'Invalid expense ID.' });
         }
 
-        await Expense.findByIdAndDelete(req.params.id);
-        res.json({ msg: 'Expense removed' });
+        const expense = await Expense.findOne({ _id: req.params.id, userId: req.userId });
+        if (!expense) {
+            return res.status(404).json({ msg: 'Expense not found.' });
+        }
+
+        await expense.deleteOne();
+        return res.json({ msg: 'Expense removed' });
     } catch (err) {
-        console.error(err.message);
-        res.status(500).json({ msg: 'Server Error' });
+        console.error('Delete expense error:', err.message);
+        return res.status(500).json({ msg: 'Server Error' });
     }
 });
 
