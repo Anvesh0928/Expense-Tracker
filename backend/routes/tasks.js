@@ -1,79 +1,88 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const router = express.Router();
 const Task = require('../models/Task');
+const requireUser = require('../utils/requireUser');
 
-// Check that a user-id header was sent
-const checkAuth = (req, res, next) => {
-    const userId = req.headers['user-id'];
-    if (!userId) return res.status(401).json({ msg: 'No User ID, authorization denied' });
-    req.userId = userId;
-    next();
-};
+router.use(requireUser);
 
 // GET /api/tasks
-router.get('/', checkAuth, async (req, res) => {
+router.get('/', async (req, res) => {
     try {
         const tasks = await Task.find({ userId: req.userId }).sort({ createdAt: -1 });
-        res.json(tasks);
+        return res.json(tasks);
     } catch (err) {
-        console.error(err.message);
-        res.status(500).json({ msg: 'Server Error' });
+        console.error('Get tasks error:', err.message);
+        return res.status(500).json({ msg: 'Server Error' });
     }
 });
 
 // POST /api/tasks
-router.post('/', checkAuth, async (req, res) => {
+router.post('/', async (req, res) => {
     try {
-        const { taskName } = req.body;
-        const newTask = new Task({ userId: req.userId, taskName });
-        const task = await newTask.save();
-        res.json(task);
+        const taskName = typeof req.body.taskName === 'string' ? req.body.taskName.trim() : '';
+
+        if (!taskName) {
+            return res.status(400).json({ msg: 'Task name is required.' });
+        }
+
+        const task = await Task.create({
+            userId: req.userId,
+            taskName
+        });
+
+        return res.status(201).json(task);
     } catch (err) {
-        console.error(err.message);
-        res.status(500).json({ msg: 'Server Error' });
+        console.error('Create task error:', err.message);
+        return res.status(500).json({ msg: 'Server Error' });
     }
 });
 
-// PUT /api/tasks/:id — toggle status
-router.put('/:id', checkAuth, async (req, res) => {
+// PUT /api/tasks/:id — update status
+router.put('/:id', async (req, res) => {
     try {
-        const { status } = req.body;
-
-        const task = await Task.findById(req.params.id);
-        if (!task) return res.status(404).json({ msg: 'Task not found' });
-
-        if (task.userId.toString() !== req.userId) {
-            return res.status(401).json({ msg: 'Not authorized' });
+        if (!mongoose.isValidObjectId(req.params.id)) {
+            return res.status(400).json({ msg: 'Invalid task ID.' });
         }
 
-        const updated = await Task.findByIdAndUpdate(
-            req.params.id,
+        const { status } = req.body;
+        if (!['pending', 'completed'].includes(status)) {
+            return res.status(400).json({ msg: 'Status must be pending or completed.' });
+        }
+
+        const updated = await Task.findOneAndUpdate(
+            { _id: req.params.id, userId: req.userId },
             { $set: { status } },
-            { new: true }
+            { new: true, runValidators: true }
         );
 
-        res.json(updated);
+        if (!updated) {
+            return res.status(404).json({ msg: 'Task not found.' });
+        }
+
+        return res.json(updated);
     } catch (err) {
-        console.error(err.message);
-        res.status(500).json({ msg: 'Server Error' });
+        console.error('Update task error:', err.message);
+        return res.status(500).json({ msg: 'Server Error' });
     }
 });
 
 // DELETE /api/tasks/:id
-router.delete('/:id', checkAuth, async (req, res) => {
+router.delete('/:id', async (req, res) => {
     try {
-        const task = await Task.findById(req.params.id);
-        if (!task) return res.status(404).json({ msg: 'Task not found' });
-
-        if (task.userId.toString() !== req.userId) {
-            return res.status(401).json({ msg: 'Not authorized' });
+        if (!mongoose.isValidObjectId(req.params.id)) {
+            return res.status(400).json({ msg: 'Invalid task ID.' });
         }
 
-        await Task.findByIdAndDelete(req.params.id);
-        res.json({ msg: 'Task removed' });
+        const task = await Task.findOneAndDelete({ _id: req.params.id, userId: req.userId });
+        if (!task) {
+            return res.status(404).json({ msg: 'Task not found.' });
+        }
+
+        return res.json({ msg: 'Task removed' });
     } catch (err) {
-        console.error(err.message);
-        res.status(500).json({ msg: 'Server Error' });
+        console.error('Delete task error:', err.message);
+        return res.status(500).json({ msg: 'Server Error' });
     }
 });
 
