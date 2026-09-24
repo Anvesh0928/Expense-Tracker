@@ -28,15 +28,21 @@ app.use((req, res, next) => {
     next();
 });
 
-async function startServer() {
+async function connectDatabase() {
     if (!process.env.MONGO_URI) {
-        console.error('MONGO_URI is not configured. Server was not started.');
-        process.exitCode = 1;
+        throw new Error('MONGO_URI is not configured.');
+    }
+
+    if (mongoose.connection.readyState === 1) {
         return;
     }
 
+    await mongoose.connect(process.env.MONGO_URI);
+}
+
+async function startServer() {
     try {
-        await mongoose.connect(process.env.MONGO_URI);
+        await connectDatabase();
         console.log('MongoDB Connected...');
 
         app.listen(PORT, () => {
@@ -48,4 +54,8 @@ async function startServer() {
     }
 }
 
-startServer();
+module.exports = { app, connectDatabase };
+
+if (require.main === module) {
+    startServer();
+}
